@@ -1,12 +1,19 @@
 var delay = (seconds) => new Promise((resolves, rejects) => {
-    setTimeout(() => {
-        resolves('the long delay has ended')
-    }, time);
+  if (seconds > 3) {
+    rejects(new Error(`${seconds} is too long!`))
+  }
+
+  setTimeout(() => {
+    resolves('the long delay has ended')
+  }, seconds * 1000);
 });
 
-delay(1)
+delay(4)
   .then(console.log)
   .then(() => 42)
-  .then((number) => console.log('Hello world: ${number}'));
+  .then((number) => console.log(`Hello world: ${number}`))
+  .catch(err => {
+    console.log(`${err}`);
+  })
 
 console.log('end first tick');
