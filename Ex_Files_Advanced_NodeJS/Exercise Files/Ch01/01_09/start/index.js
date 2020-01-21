@@ -1,3 +1,6 @@
+var logUpdate = require('log-update');
+var toX = () => 'X';
+
 var delay = (seconds) => new Promise((resolves) => {
     setTimeout(resolves, seconds*1000);
 });
@@ -14,3 +17,48 @@ var tasks = [
   delay(3),
   delay(5)
 ];
+
+class PromiseQueue {
+  constructor(
+    promises = [],
+    concurrentCount = 1,
+  ) {
+    this.concurrentCount = concurrentCount;
+    this.total = promises.length;
+    this.todo = promises;
+    this.running = [];
+    this.complete = [];
+  }
+
+  get runAnother() {
+    return (this.running.lenth < this.concurrentCount) && this.todo.length;
+  }
+
+  graphTasks() {
+    var { todo, running, complete } = this;
+
+    logUpdate(`
+
+    todo: [${todo.map(toX)}]
+    running: [${todo.map(toX)}]
+    complete: [${todo.map(toX)}]
+    
+    `)
+  }
+
+  run() {
+    while (this.runAnother) {
+      var promise = this.todo.shift;
+      promise.then(() => {
+        this.complete.push(this.running.shift);
+        this.graphTasks();
+        this.run();
+      })
+      this.running.push(promise);
+      this.graphTasks();
+    }
+  }
+}
+
+var delayQ = new PromiseQueue(tasks, 2);
+delayQ.run();
