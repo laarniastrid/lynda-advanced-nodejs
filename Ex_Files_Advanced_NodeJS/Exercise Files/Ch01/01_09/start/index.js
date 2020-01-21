@@ -31,7 +31,7 @@ class PromiseQueue {
   }
 
   get runAnother() {
-    return (this.running.lenth < this.concurrentCount) && this.todo.length;
+    return (this.running.length < this.concurrentCount) && this.todo.length;
   }
 
   graphTasks() {
@@ -40,17 +40,17 @@ class PromiseQueue {
     logUpdate(`
 
     todo: [${todo.map(toX)}]
-    running: [${todo.map(toX)}]
-    complete: [${todo.map(toX)}]
+    running: [${running.map(toX)}]
+    complete: [${complete.map(toX)}]
     
     `)
   }
 
   run() {
     while (this.runAnother) {
-      var promise = this.todo.shift;
+      var promise = this.todo.shift();
       promise.then(() => {
-        this.complete.push(this.running.shift);
+        this.complete.push(this.running.shift());
         this.graphTasks();
         this.run();
       })
